@@ -58,9 +58,9 @@
                 value = value / 255 * levels;
 
                 //This is the RGB version
-                var rvalue = pixel.r / 255 * levels;
-                var gvalue = pixel.g / 255 * levels;
-                var bvalue = pixel.b / 255 * levels;
+                //var rvalue = pixel.r / 255 * levels;
+                //var gvalue = pixel.g / 255 * levels;
+                //var bvalue = pixel.b / 255 * levels;
 
                 // Get the corresponding threshold of the pixel
                 var num = parseInt(Math.sqrt(levels-1));
