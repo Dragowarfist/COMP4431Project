@@ -100,6 +100,7 @@
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="#no-op"><i>Do Nothing</i></a></li>
                             <li><a class="dropdown-item" href="#dither">Ordered Dithering</a></li>
+                            <li><a class="dropdown-item" href="#error-diffuse-dither">Error Diffusion Dithering</a></li>
                         </ul>
                     </li>
 
@@ -347,6 +348,13 @@
                                     </select>
                                 </div>
                                 <div class="col-3">
+                                    <label for="dither-color">Color:</label>
+                                    <select class="custom-select" id="dither-color">
+                                        <option value="original">GrayScale</option>
+                                        <option value="processed">RGB</option>
+                                    </select>
+                                </div>
+                                <div class="col-3">
                                     <label for="dither-transparent">White shown as transparent:</label>
                                     <div class="input-group">
                                         <input class="form-control toggle-control" id="dither-transparent" type="checkbox" />
@@ -355,6 +363,44 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Error Diffusion dithering -->
+                    <div class="tab-pane" id="error-diffuse-dither">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-3">
+                                    <label for="error-diffuse-dither-input">Input:</label>
+                                    <select class="custom-select" id="error-diffuse-dither-input">
+                                        <option value="original">Original Image</option>
+                                        <option value="processed">Processed Image</option>
+                                    </select>
+                                </div>
+                                <div class="col-3">
+                                    <label for="error-diffuse-dither-type">Matrix type:</label>
+                                    <select class="custom-select" id="dither-matrix-type">
+                                        <option value="Floyd-Steinberg">Floyd-Steinberg</option>
+                                        <option value="Jarvis-Judice-Ninke">Jarvis-Judice-Ninke</option>
+                                        <option value="dizzy">Dizzy Dithering</option>
+                                        <option value="variable-coefficient">Variable-Coefficient</option>
+                                    </select>
+                                </div>
+                                <div class="col-3">
+                                    <label for="error-diffuse-dither-color">Color:</label>
+                                    <select class="custom-select" id="error-diffuse-dither-color">
+                                        <option value="original">GrayScale</option>
+                                        <option value="processed">RGB</option>
+                                    </select>
+                                </div>
+                                <div class="col-3">
+                                    <label for="error-diffuse-dither-transparent">White shown as transparent:</label>
+                                    <div class="input-group">
+                                        <input class="form-control toggle-control" id="dither-transparent" type="checkbox" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
 
                     <!-- Sobel edge -->
                     <div class="tab-pane" id="sobel">
