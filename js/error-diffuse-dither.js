@@ -1,132 +1,160 @@
 (function(imageproc) {
     "use strict";
 
-    /*
-     * Apply ordered dithering to the input data
-     */
-    imageproc.errorDiffuseDither = function(inputData, outputData, matrixType) {
-        console.log("Applying error diffusion dithering...");
-
-        /*
-         * TODO: You need to extend the dithering processing technique
-         * to include multiple matrix types
-         */
-
-        // At the moment, the code works only for the Bayer's 2x2 matrix
-        // You need to include other matrix types
-
-        // Set up the matrix
-        var matrix = [ ];
-        var levels = 0;
-        var rows = inputData.height;
-        var cols = inputData.width;
-        var error = [];
-        for(var i = 0; i < rows; ++i){
-            error[i] = [];
-            for(var j = 0; j < cols; ++j){
-                error[i].push(parseFloat(0));
+    // Error diffusion matrices
+    const diffusionMatrices = {
+        "Floyd-Steinberg": {
+            offsets: [
+                {x: 1, y: 0, weight: 7},
+                {x: -1, y: 1, weight: 3},
+                {x: 0, y: 1, weight: 5},
+                {x: 1, y: 1, weight: 1}
+            ],
+            divisor: 16
+        },
+        "Jarvis-Judice-Ninke": {
+            offsets: [
+                {x: 1, y: 0, weight: 7},
+                {x: 2, y: 0, weight: 5},
+                {x: -2, y: 1, weight: 3},
+                {x: -1, y: 1, weight: 5},
+                {x: 0, y: 1, weight: 7},
+                {x: 1, y: 1, weight: 5},
+                {x: 2, y: 1, weight: 3},
+                {x: -2, y: 2, weight: 1},
+                {x: -1, y: 2, weight: 3},
+                {x: 0, y: 2, weight: 5},
+                {x: 1, y: 2, weight: 3},
+                {x: 2, y: 2, weight: 1}
+            ],
+            divisor: 48
+        },
+        "dizzy": {
+            offsets: [
+                // First ring
+                {x: 1, y: 0, weight: 8},
+                {x: 1, y: 1, weight: 4},
+                {x: 0, y: 1, weight: 6},
+                {x: -1, y: 1, weight: 4},
+                {x: -1, y: 0, weight: 8},
+                {x: -1, y: -1, weight: 4},
+                {x: 0, y: -1, weight: 6},
+                {x: 1, y: -1, weight: 4},
+                // Second ring
+                {x: 2, y: 0, weight: 4},
+                {x: 2, y: 1, weight: 2},
+                {x: 2, y: 2, weight: 1},
+                {x: 1, y: 2, weight: 2},
+                {x: 0, y: 2, weight: 3},
+                {x: -1, y: 2, weight: 2},
+                {x: -2, y: 2, weight: 1},
+                {x: -2, y: 1, weight: 2},
+                {x: -2, y: 0, weight: 4},
+                {x: -2, y: -1, weight: 2},
+                {x: -2, y: -2, weight: 1},
+                {x: -1, y: -2, weight: 2},
+                {x: 0, y: -2, weight: 3},
+                {x: 1, y: -2, weight: 2},
+                {x: 2, y: -2, weight: 1},
+                {x: 2, y: -1, weight: 2}
+            ],
+            divisor: 64
+        },
+        "variable-coefficient": {
+            getPattern: function(x, y) {
+                // Implementation based on Ostromoukhov's paper
+                const patterns = [
+                    {offsets: [{x:1,y:0,w:11}, {x:-1,y:1,w:5}], divisor: 16},
+                    {offsets: [{x:1,y:0,w:9}, {x:0,y:1,w:5}, {x:1,y:1,w:2}], divisor: 16},
+                    {offsets: [{x:1,y:0,w:7}, {x:-1,y:1,w:13}], divisor: 20},
+                    {offsets: [{x:1,y:0,w:15}, {x:-1,y:1,w:1}], divisor: 16}
+                ];
+                return patterns[(x + y * 3) % 4];
             }
         }
-        var size = 0;
-        var matrixWidth = 0;
-        var matrixRow = 0;
+    };
 
-        // The following code uses Bayer's 2x2 matrix to create the
-        // dithering effect. You need to extend it to work for different
-        // matrix types
-        
-        
-        switch(matrixType){ 
-            case "Floyd-Steinberg":
-                matrix = [  [0, 0, 7], 
-                            [3, 5, 1] ];
-                levels = 16;
-                size = 1;
-                matrixWidth = 3;
-                matrixRow = 2;
-                break;
-            case "Jarvis-Judice-Ninke":
-                matrix = [  [0, 0, 0, 8, 4],
-                            [2, 4, 8, 4, 2],
-                            [1, 2, 4, 2, 1]];
-                levels = 42;
-                size = 2;
-                matrixWidth = 5;
-                matrixRow = 3;
-                break;
-            case "Fan":
-                matrix = [  [0, 0, 0, 7],
-                            [1, 3, 5, 0]];
-                levels = 16;
-                size = 2;
-                matrixWidth = 4;
-                matrixRow = 3;
-            case "line":
-                matrix = [  [2.55,   2.55,    2.55,    4.25], 
-                            [2.55,   2.55,    4.25,  2.55],
-                            [2.55,   4.25,  2.55,    2.55],
-                            [4.25, 2.55,    2.55,    2.55]];
-                levels = 17;
-                break;
-            case "diamond":
-                matrix = [  [   2.55,    2.55,    4.25  , 2.55], 
-                            [   2.55,    4.25,      2.55, 4.25 ],
-                            [   4.25,      2.55,    2.55, 2.55],
-                            [   2.55,    4.25,      2.55, 4.25 ]];
-                levels = 17;
-                break;
+    imageproc.errorDiffuseDither = function(inputData, outputData, matrixType, colorMode) {
+        console.log("Applying error diffusion dithering (" + colorMode + ")...");
+
+        const matrixInfo = diffusionMatrices[matrixType];
+        if (!matrixInfo) return;
+
+        // Create working buffer using existing method
+        const buffer = imageproc.createBuffer(outputData);
+        imageproc.copyImageData(inputData, buffer);
+
+        // Convert to grayscale if needed
+        const useGrayscale = colorMode === "original";
+        if (useGrayscale) {
+            const grayscaleBuffer = imageproc.createBuffer(outputData);
+            imageproc.grayscale(buffer, grayscaleBuffer);
+            imageproc.copyImageData(grayscaleBuffer, buffer);
         }
-        //console.log("Done Switch");
-        
-        console.log(inputData.width, inputData.width);
 
-        for (var y = 0; y < inputData.height; y++) {
-            for (var x = 0; x < inputData.width; x++) {
-                var pixel = imageproc.getPixel(inputData, x, y);
-                
+        for (let y = 0; y < inputData.height; y++) {
+            for (let x = 0; x < inputData.width; x++) {
+                const i = (y * inputData.width + x) * 4;
+                let offsets, divisor;
 
-                var grayscale = (pixel.r + pixel.b + pixel.g)/3;
-                //console.log(error[y][x], x, y);
-                //console.log(grayscale);
-                grayscale += error[y][x];
-                //console.log(grayscale);
-                
-
-                var result;
-
-                if(grayscale < 128){
-                    result = 0;
-                }else{
-                    result = 255
+                if (matrixType === "variable-coefficient") {
+                    // Handle variable coefficient separately
+                    const pattern = matrixInfo.getPattern(x, y);
+                    offsets = pattern.offsets;
+                    divisor = pattern.divisor;
+                } else {
+                    // Original handling for other methods
+                    offsets = matrixInfo.offsets;
+                    divisor = matrixInfo.divisor;
                 }
-                
-                //console.log("Start Loop");
-                for(var i = 0; i < matrixRow; ++i){
-                    //console.log(i);
-                    for(var j = -size ; j+size < matrixWidth; ++j){
-                        //console.log(i, j);
-                        if(x+j < 0 || x+j >= inputData.width || y + i >= inputData.height){
-                            continue;
+
+                // Process channels
+                if (useGrayscale) {
+                    // Grayscale processing
+                    const oldValue = buffer.data[i];
+                    const newValue = oldValue > 128 ? 255 : 0;
+                    const error = oldValue - newValue;
+
+                    // Set output pixel
+                    outputData.data[i] = outputData.data[i+1] = outputData.data[i+2] = newValue;
+
+                    // Diffuse error to neighbors
+                    offsets.forEach(offset => {
+                        const nx = x + offset.x;
+                        const ny = y + offset.y;
+                        
+                        if (nx >= 0 && nx < inputData.width && ny >= 0 && ny < inputData.height) {
+                            const ni = (ny * inputData.width + nx) * 4;
+                            const delta = error * (offset.w || offset.weight) / divisor;
+                            buffer.data[ni] = Math.min(255, Math.max(0, buffer.data[ni] + delta));
                         }
-                        // if(j == 0 || i == 0 || (x - j < 0)){
-                        //     continue;
-                        // }
-                        //console.log(i , j + size);
-                        error[y+i][x+j] -= matrix[i][j + size] * (result - grayscale) / levels;
-                        //console.log(matrix[i][j + size] * (result - grayscale) / levels);
+                    });
+                } else {
+                    // RGB channel processing
+                    for (let c = 0; c < 3; c++) {
+                        const oldValue = buffer.data[i + c];
+                        const newValue = oldValue > 128 ? 255 : 0;
+                        const error = oldValue - newValue;
+
+                        // Set output channel
+                        outputData.data[i + c] = newValue;
+
+                        // Diffuse error to neighbors
+                        offsets.forEach(offset => {
+                            const nx = x + offset.x;
+                            const ny = y + offset.y;
+                            
+                            if (nx >= 0 && nx < inputData.width && ny >= 0 && ny < inputData.height) {
+                                const ni = (ny * inputData.width + nx) * 4 + c;
+                                const delta = error * (offset.w || offset.weight) / divisor;
+                                buffer.data[ni] = Math.min(255, Math.max(0, buffer.data[ni] + delta));
+                            }
+                        });
                     }
-                    
                 }
-
                 
-                var i = (x + y * outputData.width) * 4;
-                outputData.data[i]     = 
-                outputData.data[i + 1] = 
-                outputData.data[i + 2] = result;
-
-                
+                outputData.data[i+3] = 255; // Preserve alpha
             }
         }
-    }
- 
+    };
 }(window.imageproc = window.imageproc || {}));

@@ -92,11 +92,13 @@
                 imageproc.dither(inputImage, outputImage,
                                  $("#dither-matrix-type").val());
                 break;
+
             case "error-diffuse-dither":
                 if ($("#error-diffuse-dither-input").val() == "processed")
                     inputImage = processedImage;
                 imageproc.errorDiffuseDither(inputImage, outputImage,
-                                 $("#error-diffuse-dither-type").val());
+                    $("#error-diffuse-dither-type").val(),
+                    $("#error-diffuse-dither-color").val());
                 break;
         }
     }
@@ -179,17 +181,24 @@
                  * TODO: You need to show the base layer (baseLayer) for
                  * the white pixels (transparent)
                  */
-                for (var i = 0; i < shadeLayer.data.length; i+=4) {
-                    if (shadeLayer.data[i] == 255) {
-                
-                        shadeLayer.data[i]     = baseLayer.data[i]  ;
-                        shadeLayer.data[i+1]   = baseLayer.data[i+1];
-                        shadeLayer.data[i+2]   = baseLayer.data[i+2];
-                
+                for (let i = 0; i < shadeLayer.data.length; i+=4) {
+                    if (shadeLayer.data[i] == 255 && shadeLayer.data[i + 1] == 255 && shadeLayer.data[i + 2] == 255) {
+                        shadeLayer.data[i] = baseLayer.data[i];
+                        shadeLayer.data[i + 1] = baseLayer.data[i + 1];
+                        shadeLayer.data[i + 2] = baseLayer.data[i + 2];
                     }
-                    //console.log("Hello");
                 }
+            }
 
+            // Show base layer for error diffusing dithering
+            if (currentShadeLayerOp == "error-diffuse-dither" && $("#error-dither-transparent").prop("checked")) {
+                for (let i = 0; i < shadeLayer.data.length; i+=4) {
+                    if (shadeLayer.data[i] == 255 && shadeLayer.data[i + 1] == 255 && shadeLayer.data[i + 2] == 255) {
+                        shadeLayer.data[i] = baseLayer.data[i];
+                        shadeLayer.data[i + 1] = baseLayer.data[i + 1];
+                        shadeLayer.data[i + 2] = baseLayer.data[i + 2];
+                    }
+                }
             }
         }
 
@@ -207,25 +216,24 @@
                  * TODO: You need to show the shade layer (shadeLayer) for
                  * the non-edge pixels (transparent)
                  */
-                var value = 255;
-                if($("#sobel-flip").prop("checked")){
-                    value = 0;
-                }
-                for (var i = 0; i < outlineLayer.data.length; i+=4) {
-                    if (outlineLayer.data[i] != value) {
-                
-                        outlineLayer.data[i]     = shadeLayer.data[i]  ;
-                        outlineLayer.data[i+1]   = shadeLayer.data[i+1];
-                        outlineLayer.data[i+2]   = shadeLayer.data[i+2];
-                
-                    }else{
-                        outlineLayer.data[i]     = 
-                        outlineLayer.data[i+1]   = 
-                        outlineLayer.data[i+2]   = value;
+                let sobelFlipped = $("#sobel-flip").prop("checked");
+                if (sobelFlipped == true) {
+                    for (let i = 0; i < outlineLayer.data.length; i+=4) {
+                        if (outlineLayer.data[i] == 255 && outlineLayer.data[i + 1] == 255 && outlineLayer.data[i + 2] == 255) {
+                            outlineLayer.data[i] = shadeLayer.data[i];
+                            outlineLayer.data[i + 1] = shadeLayer.data[i + 1];
+                            outlineLayer.data[i + 2] = shadeLayer.data[i + 2];
+                        }
+                    }
+                } else {
+                    for (let i = 0; i < outlineLayer.data.length; i+=4) {
+                        if (outlineLayer.data[i] == 0 && outlineLayer.data[i + 1] == 0 && outlineLayer.data[i + 2] == 0) {
+                            outlineLayer.data[i] = shadeLayer.data[i];
+                            outlineLayer.data[i + 1] = shadeLayer.data[i + 1];
+                            outlineLayer.data[i + 2] = shadeLayer.data[i + 2];
+                        }
                     }
                 }
-                
-
             }
         }
 
