@@ -92,6 +92,12 @@
                 imageproc.dither(inputImage, outputImage,
                                  $("#dither-matrix-type").val());
                 break;
+            case "error-diffuse-dither":
+                if ($("#error-diffuse-dither-input").val() == "processed")
+                    inputImage = processedImage;
+                imageproc.errorDiffuseDither(inputImage, outputImage,
+                                 $("#error-diffuse-dither-type").val());
+                break;
         }
     }
 
