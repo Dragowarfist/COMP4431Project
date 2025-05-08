@@ -11,6 +11,14 @@
                 {x: 1, y: 1, weight: 1}
             ],
             divisor: 16
+        },"Fan" : {
+            offsets: [
+                {x: 1, y: 0, weight: 7},
+                {x: -2, y: 1, weight: 1},
+                {x: -1, y: 1, weight: 3},
+                {x: 0, y: 1, weight: 5}
+            ],
+            divisor: 16
         },
         "Jarvis-Judice-Ninke": {
             offsets: [
@@ -28,6 +36,23 @@
                 {x: 2, y: 2, weight: 1}
             ],
             divisor: 48
+        },
+        "Stucki": {
+            offsets: [
+                {x: 1, y: 0, weight: 8},
+                {x: 2, y: 0, weight: 4},
+                {x: -2, y: 1, weight: 2},
+                {x: -1, y: 1, weight: 4},
+                {x: 0, y: 1, weight: 8},
+                {x: 1, y: 1, weight: 4},
+                {x: 2, y: 1, weight: 2},
+                {x: -2, y: 2, weight: 1},
+                {x: -1, y: 2, weight: 2},
+                {x: 0, y: 2, weight: 4},
+                {x: 1, y: 2, weight: 2},
+                {x: 2, y: 2, weight: 1}
+            ],
+            divisor: 42
         },
         "dizzy": {
             offsets: [
