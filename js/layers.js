@@ -90,7 +90,8 @@
                 if ($("#dither-input").val() == "processed")
                     inputImage = processedImage;
                 imageproc.dither(inputImage, outputImage,
-                                 $("#dither-matrix-type").val());
+                                 $("#dither-matrix-type").val(),
+                                $("#dither-color").val());
                 break;
 
             case "error-diffuse-dither":
