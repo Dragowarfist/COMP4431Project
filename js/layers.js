@@ -220,8 +220,19 @@
                 }
             }
 
-            // Show base layer for error diffusing dithering
+            // Show base layer for mixed dithering
             if (currentShadeLayerOp == "mixed-dither" && $("#mixed-dither-transparent").prop("checked")) {
+                for (let i = 0; i < shadeLayer.data.length; i+=4) {
+                    if (shadeLayer.data[i] == 255 && shadeLayer.data[i + 1] == 255 && shadeLayer.data[i + 2] == 255) {
+                        shadeLayer.data[i] = baseLayer.data[i];
+                        shadeLayer.data[i + 1] = baseLayer.data[i + 1];
+                        shadeLayer.data[i + 2] = baseLayer.data[i + 2];
+                    }
+                }
+            }
+
+            // Show base layer for mixed dithering
+            if (currentShadeLayerOp == "block-error-dither" && $("#block-dither-transparent").prop("checked")) {
                 for (let i = 0; i < shadeLayer.data.length; i+=4) {
                     if (shadeLayer.data[i] == 255 && shadeLayer.data[i + 1] == 255 && shadeLayer.data[i + 2] == 255) {
                         shadeLayer.data[i] = baseLayer.data[i];
