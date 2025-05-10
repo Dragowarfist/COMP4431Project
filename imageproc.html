@@ -102,6 +102,7 @@
                             <li><a class="dropdown-item" href="#no-op"><i>Do Nothing</i></a></li>
                             <li><a class="dropdown-item" href="#dither">Ordered Dithering</a></li>
                             <li><a class="dropdown-item" href="#error-diffuse-dither">Error Diffusion Dithering</a></li>
+                            <li><a class="dropdown-item" href="#mixed-dither">Mixed Dithering</a></li>
                         </ul>
                     </li>
 
@@ -383,6 +384,7 @@
                                         <option value="Fan">Fan</option>
                                         <option value="Jarvis-Judice-Ninke">Jarvis-Judice-Ninke</option>
                                         <option value="Stucki">Stucki</option>
+                                        <option value="Atkinson">Atkinson</option>
                                         <option value="dizzy">Dizzy Dithering</option>
                                         <option value="variable-coefficient">Variable-Coefficient</option>
                                     </select>
@@ -396,6 +398,53 @@
                                 </div>
                                 <div class="col-3">
                                     <label for="error-diffuse-dither-transparent">White shown as transparent:</label>
+                                    <div class="input-group">
+                                        <input class="form-control toggle-control" id="error-dither-transparent" type="checkbox" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mixed dithering -->
+                    <div class="tab-pane" id="mixed-dither">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-3">
+                                    <label for="mixed-dither-input">Input:</label>
+                                    <select class="custom-select" id="mixed-dither-input">
+                                        <option value="original">Original Image</option>
+                                        <option value="processed">Processed Image</option>
+                                    </select>
+                                </div>
+                                <div class="col-3">
+                                    <label for="mixed-ordered-dither-type">Ordered Dither Matrix type:</label>
+                                    <select class="custom-select" id="mixed-ordered-dither-type">
+                                         <option value="bayer2">Bayer's 2&times;2 Matrix</option>
+                                        <option value="bayer4">Bayer's 4&times;4 Matrix</option>
+                                    </select>
+                                </div>
+                                <div class="col-3">
+                                    <label for="mixed-error-diffuse-dither-type">Error Diffuse Dither Matrix type:</label>
+                                    <select class="custom-select" id="mixed-error-diffuse-dither-type">
+                                        <option value="Floyd-Steinberg">Floyd-Steinberg</option>
+                                        <option value="Fan">Fan</option>
+                                        <option value="Jarvis-Judice-Ninke">Jarvis-Judice-Ninke</option>
+                                        <option value="Stucki">Stucki</option>
+                                        <option value="Atkinson">Atkinson</option>
+                                        <option value="dizzy">Dizzy Dithering</option>
+                                        <option value="variable-coefficient">Variable-Coefficient</option>
+                                    </select>
+                                </div>
+                                <div class="col-3">
+                                    <label for="mixed-dither-color">Color:</label>
+                                    <select class="custom-select" id="mixed-dither-color">
+                                        <option value="original">GrayScale</option>
+                                        <option value="processed">RGB</option>
+                                    </select>
+                                </div>
+                                <div class="col-3">
+                                    <label for="mixed-dither-transparent">White shown as transparent:</label>
                                     <div class="input-group">
                                         <input class="form-control toggle-control" id="error-dither-transparent" type="checkbox" />
                                     </div>
@@ -479,6 +528,7 @@
     <script src="js/kuwahara.js"></script>
     <script src="js/dither.js"></script>
     <script src="js/error-diffuse-dither.js"></script>
+    <script src="js/mixed-dither.js"></script>
     <script src="js/outline.js"></script>
     <script src="js/main.js"></script>
     <script src="js/layers.js"></script>
