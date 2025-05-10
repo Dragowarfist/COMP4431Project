@@ -3,12 +3,34 @@
 
     const blockMatrices = {
         "Damera-Venkata-Evans2":{
-            weights: [[1, 1],
-                         [1, 1]
+            weights: [[1, 1,] ,
+                        [1 ,1]
             ],
             divisor  : 4,
             xsize : 2,
-            ysize : 2
+            ysize : 2,
+
+            choices: [
+                [   [255, 255],
+                    [255, 255]],
+
+                [   [255, 0 ], 
+                    [255, 0]],
+
+                [   [0, 0],
+                    [255, 255]],
+
+                [   [0 , 255],
+                    [0, 255]],
+
+                [   [255, 255],
+                    [0, 0]],
+                
+                [   [0, 0],
+                    [0, 0]]
+            ],
+
+            numChoices : 6
 
         },
         "Weighted":{
@@ -17,7 +39,103 @@
             ],
             divisor : 16,
             xsize : 2,
-            ysize : 2
+            ysize : 2,
+
+            choices: [
+                [   [255, 255],
+                    [255, 255]],
+
+                [   [255, 0 ], 
+                    [255, 0]],
+
+                [   [0, 0],
+                    [255, 255]],
+
+                [   [0 , 255],
+                    [0, 255]],
+
+                [   [255, 255],
+                    [0, 0]],
+                
+                [   [0, 0],
+                    [0, 0]]
+            ],
+
+            numChoices : 6
+
+        },"3dimension":{
+            weights: [   [1 , 1, 1],
+                         [1 , 1, 1],
+                         [1 , 1, 1]
+            ],
+            divisor : 9,
+            xsize : 3,
+            ysize : 3,
+
+            choices: [
+                [   [255, 255, 255],
+                    [255, 255, 255],
+                    [255, 255, 255]],
+
+                [   [0, 255, 255],
+                    [255, 255, 255],
+                    [255, 255, 255]],
+
+                [   [255, 0, 255],
+                    [255, 255, 255],
+                    [255, 255, 255]],
+
+                [   [255, 255, 0],
+                    [255, 255, 255],
+                    [255, 255, 255]],
+
+                [   [255, 255, 255],
+                    [0, 255, 255],
+                    [255, 255, 255]],
+                
+                [   [255, 255, 255],
+                    [255, 0, 255],
+                    [255, 255, 255]],
+                
+                [   [255, 255, 255],
+                    [255, 255, 0],
+                    [255, 255, 255]],
+
+                [   [255, 255, 255],
+                    [255, 255, 255],
+                    [0, 255, 255]],
+
+                [   [255, 255, 255],
+                    [255, 255, 255],
+                    [255, 0, 255]],
+
+                [   [255, 255, 255],
+                    [255, 255, 255],
+                    [255, 255, 0]],
+
+                [   [0, 0, 255],
+                    [0, 0, 255],
+                    [255, 255, 255]],
+
+                [   [255, 0, 0],
+                    [255, 0, 0],
+                    [255, 255, 255]],
+
+                [   [255, 255, 255],
+                    [0, 0, 255],
+                    [0, 0, 255]],
+
+                [   [255, 255, 255],
+                    [255, 0, 0],
+                    [255, 0, 0]],
+
+                [   [0, 0, 0],
+                    [0, 0, 0],
+                    [0, 0, 0]],
+            ],
+
+            numChoices : 15
+
         }
     }
 
@@ -184,20 +302,40 @@
                     // Grayscale processing
                     
                     var totalError = 0;
+                    var minError = 256*4;
+                    var choose = 0;
 
-                    //processing the table
-                    for(var y1 = 0; y1 < ysize; ++y1){
-                        for(var x1 = 0; x1 < xsize; ++x1){
-                            const oldValue = buffer.data[i];
-                            const newValue = oldValue > 128 ? 255 : 0;
-                            const error = oldValue - newValue;
-                            totalError += error;
-
-                            var j = i + (y1 * inputData.width + x1) * 4;
-                            // Set output pixel
-                            outputData.data[j] = outputData.data[j+1] = outputData.data[j+2] = newValue;
+                    for(var choice = 0; choice < blockMatrixInfo.numChoices; ++choice){
+                        var curTotal = 0;
+                        var minVal = 0;
+                        for(var y1 = 0; y1 < ysize; ++y1){
+                            for(var x1 = 0; x1 < xsize; ++x1){
+                                const oldValue = buffer.data[i];
+                                const newValue = blockMatrixInfo.choices[choice][y1][x1];
+                                const error = oldValue - newValue;
+                                curTotal += error;
+                                minVal += Math.abs(error);
+                            }
+                        }
+                        if(minVal < minError){
+                            minError = minVal;
+                            totalError = curTotal;
+                            choose = choice;
+                            
                         }
                     }
+                    //console.log(choose);
+
+                    for(var y1 = 0; y1 < ysize; ++y1){
+                        for(var x1 = 0; x1 < xsize; ++x1){
+                            var j = i + (y1 * inputData.width + x1) * 4;
+                            // Set output pixel
+                            outputData.data[j] = outputData.data[j+1] = outputData.data[j+2] = blockMatrixInfo.choices[choose][y1][x1];
+                        }
+                    }
+
+                    //processing the table
+                    
                 
                     
 
@@ -227,19 +365,35 @@
                     for (let c = 0; c < 3; c++) {
 
                         var totalError = 0;
+                        var minError = 256*4;
+                        var choose = 0;
 
-                        //processing the table
+                        for(var choice = 0; choice < blockMatrixInfo.numChoices; ++choice){
+                            var curTotal = 0;
+                            var minVal = 0;
+                            for(var y1 = 0; y1 < ysize; ++y1){
+                                for(var x1 = 0; x1 < xsize; ++x1){
+                                    const oldValue = buffer.data[i + c];
+                                    const newValue = blockMatrixInfo.choices[choice][y1][x1];
+                                    const error = oldValue - newValue;
+                                    curTotal += error;
+                                    minVal += Math.abs(error);
+                                }
+                            }
+                            if(minVal < minError){
+                                minError = minVal;
+                                totalError = curTotal;
+                                choose = choice;
+                                
+                            }
+                        }
+                        //console.log(choose);
+
                         for(var y1 = 0; y1 < ysize; ++y1){
                             for(var x1 = 0; x1 < xsize; ++x1){
-                                const oldValue = buffer.data[i + c];
-                                const newValue = oldValue > 128 ? 255 : 0;
-                                const error = oldValue - newValue;
-                                totalError += error;
-
                                 var j = i + (y1 * inputData.width + x1) * 4;
-
-                                // Set output channel
-                                outputData.data[j + c] = newValue;
+                                // Set output pixel
+                                outputData.data[j+c] =  blockMatrixInfo.choices[choose][y1][x1];
                             }
                         }
 
