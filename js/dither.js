@@ -25,7 +25,8 @@
         
         switch(matrixType){ 
             case "bayer2":
-                matrix = [ [1, 3], [4, 2] ];
+                matrix = [  [1, 3], 
+                            [4, 2] ];
                 levels = 5;
                 break;
             case "bayer4":

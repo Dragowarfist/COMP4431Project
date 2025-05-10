@@ -1,6 +1,26 @@
 (function(imageproc) {
     "use strict";
 
+    const orderedMatrices = {
+        "bayer2":{
+            thresholds: [   [1 , 3],
+                            [4, 2]
+            ],
+            levels : 5,
+            xsize : 2,
+            ysize : 2
+        },
+        "bayer4":{
+            thresholds:  [  [1, 9, 3, 11], 
+                            [13, 5, 15, 7], 
+                            [4, 12, 2, 10], 
+                            [16, 8, 14, 6] ],
+            levels : 17,
+            xsize : 4,
+            ysize : 4,
+        }
+    }
+
     // Error diffusion matrices
     const diffusionMatrices = {
         "Floyd-Steinberg": {
@@ -110,11 +130,25 @@
         }
     };
 
-    imageproc.errorDiffuseDither = function(inputData, outputData, matrixType, colorMode) {
-        console.log("Applying error diffusion dithering (" + colorMode + ")...");
+    imageproc.mixedDither = function(inputData, outputData, ditherMatrixType, errorMatrixType, colorMode) {
+        console.log("Applying mixed dithering (" + colorMode + ")...");
+        console.log("Hello");
+        const ditherMatrixInfo = orderedMatrices[ditherMatrixType];
+        if(!ditherMatrixInfo) return;
 
-        const matrixInfo = diffusionMatrices[matrixType];
-        if (!matrixInfo) return;
+        console.log("Hello");
+
+        const errorMatrixInfo = diffusionMatrices[errorMatrixType];
+        if (!errorMatrixInfo) return;
+
+        console.log("Hello");
+
+        let xsize, ysize;
+        xsize = ditherMatrixInfo.xsize;
+        ysize = ditherMatrixInfo.ysize;
+        const thresholdMatrix = ditherMatrixInfo.thresholds;
+        console.log("Hello");
+    
 
         // Create working buffer using existing method
         const buffer = imageproc.createBuffer(outputData);
@@ -127,28 +161,31 @@
             imageproc.grayscale(buffer, grayscaleBuffer);
             imageproc.copyImageData(grayscaleBuffer, buffer);
         }
-
+        console.log("Hello");
         for (let y = 0; y < inputData.height; y++) {
             for (let x = 0; x < inputData.width; x++) {
                 const i = (y * inputData.width + x) * 4;
                 let offsets, divisor;
+                
+                var threshold = thresholdMatrix[x % xsize][y % ysize] / ditherMatrixInfo.levels * 255;
 
-                if (matrixType === "variable-coefficient") {
+                if (errorMatrixType === "variable-coefficient") {
                     // Handle variable coefficient separately
-                    const pattern = matrixInfo.getPattern(x, y);
+                    const pattern = errorMatrixInfo.getPattern(x, y);
                     offsets = pattern.offsets;
                     divisor = pattern.divisor;
                 } else {
                     // Original handling for other methods
-                    offsets = matrixInfo.offsets;
-                    divisor = matrixInfo.divisor;
+                    offsets = errorMatrixInfo.offsets;
+                    divisor = errorMatrixInfo.divisor;
                 }
+            
 
                 // Process channels
                 if (useGrayscale) {
                     // Grayscale processing
                     const oldValue = buffer.data[i];
-                    const newValue = oldValue > 128 ? 255 : 0;
+                    const newValue = oldValue > threshold ? 255 : 0;
                     const error = oldValue - newValue;
 
                     // Set output pixel
@@ -169,7 +206,7 @@
                     // RGB channel processing
                     for (let c = 0; c < 3; c++) {
                         const oldValue = buffer.data[i + c];
-                        const newValue = oldValue > 128 ? 255 : 0;
+                        const newValue = oldValue > threshold ? 255 : 0;
                         const error = oldValue - newValue;
 
                         // Set output channel
@@ -192,5 +229,6 @@
                 outputData.data[i+3] = 255; // Preserve alpha
             }
         }
+        console.log("Hello");
     };
 }(window.imageproc = window.imageproc || {}));
