@@ -110,6 +110,15 @@
                     $("#mixed-error-diffuse-dither-type").val(),
                     $("#mixed-dither-color").val());
                 break;
+            
+            case "block-error-dither":
+                if ($("#block-error-dither-input").val() == "processed")
+                    inputImage = processedImage;
+                imageproc.blockErrorDither(inputImage, outputImage,
+                    $("#block-ordered-dither-type").val(),
+                    $("#block-error-diffuse-dither-type").val(),
+                    $("#block-dither-color").val());
+                break;
         }
     }
 

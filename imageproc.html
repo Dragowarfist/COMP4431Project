@@ -103,6 +103,7 @@
                             <li><a class="dropdown-item" href="#dither">Ordered Dithering</a></li>
                             <li><a class="dropdown-item" href="#error-diffuse-dither">Error Diffusion Dithering</a></li>
                             <li><a class="dropdown-item" href="#mixed-dither">Mixed Dithering</a></li>
+                            <li><a class="dropdown-item" href="#block-error-dither">Block Error Diffusion Dithering</a></li>
                         </ul>
                     </li>
 
@@ -453,6 +454,53 @@
                         </div>
                     </div>
 
+                    <!-- Block error diffusion dithering -->
+                    <div class="tab-pane" id="block-error-dither">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-3">
+                                    <label for="block-error-dither-input">Input:</label>
+                                    <select class="custom-select" id="block-error-dither-input">
+                                        <option value="original">Original Image</option>
+                                        <option value="processed">Processed Image</option>
+                                    </select>
+                                </div>
+                                <div class="col-3">
+                                    <label for="block-ordered-dither-type">Block Matrix type:</label>
+                                    <select class="custom-select" id="block-ordered-dither-type">
+                                        <option value="Damera-Venkata-Evans2">Damera Venkata &and; Evans &times; </option>
+                                         <option value="Weighted">Weighted</option>
+                                    </select>
+                                </div>
+                                <div class="col-3">
+                                    <label for="block-error-diffuse-dither-type">Error Diffuse Dither Matrix type:</label>
+                                    <select class="custom-select" id="block-error-diffuse-dither-type">
+                                        <option value="Floyd-Steinberg">Floyd-Steinberg</option>
+                                        <option value="Fan">Fan</option>
+                                        <option value="Jarvis-Judice-Ninke">Jarvis-Judice-Ninke</option>
+                                        <option value="Stucki">Stucki</option>
+                                        <option value="Atkinson">Atkinson</option>
+                                        <option value="dizzy">Dizzy Dithering</option>
+                                        <option value="variable-coefficient">Variable-Coefficient</option>
+                                    </select>
+                                </div>
+                                <div class="col-3">
+                                    <label for="block-dither-color">Color:</label>
+                                    <select class="custom-select" id="block-dither-color">
+                                        <option value="original">GrayScale</option>
+                                        <option value="processed">RGB</option>
+                                    </select>
+                                </div>
+                                <div class="col-3">
+                                    <label for="block-dither-transparent">White shown as transparent:</label>
+                                    <div class="input-group">
+                                        <input class="form-control toggle-control" id="error-dither-transparent" type="checkbox" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
 
                     <!-- Sobel edge -->
                     <div class="tab-pane" id="sobel">
@@ -529,6 +577,7 @@
     <script src="js/dither.js"></script>
     <script src="js/error-diffuse-dither.js"></script>
     <script src="js/mixed-dither.js"></script>
+    <script src="js/block-error-diffusion.js"></script>
     <script src="js/outline.js"></script>
     <script src="js/main.js"></script>
     <script src="js/layers.js"></script>
