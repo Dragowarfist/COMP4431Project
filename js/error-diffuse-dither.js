@@ -128,8 +128,24 @@
             imageproc.copyImageData(grayscaleBuffer, buffer);
         }
 
-        for (let y = 0; y < inputData.height; y++) {
-            for (let x = 0; x < inputData.width; x++) {
+        let corList = []
+        for(let i = 0; i < inputData.height; ++i){
+            for(let j = 0; j < inputData.width; ++j){
+                corList.push([i, j]);
+            }
+                
+        }
+        
+        if(matrixType === "dizzy"){
+            corList.sort(() => Math.random() - 0.5);
+            
+        }
+
+        for (let yp = 0; yp< inputData.height; yp++) {
+            for (let xp = 0; xp < inputData.width; xp++) {
+                let cor = corList[yp * inputData.width + xp];
+                let y = cor[0];
+                let x = cor[1];
                 const i = (y * inputData.width + x) * 4;
                 let offsets, divisor;
 
@@ -153,6 +169,27 @@
 
                     // Set output pixel
                     outputData.data[i] = outputData.data[i+1] = outputData.data[i+2] = newValue;
+                    
+
+                    let value = 0;
+                    let neighbors = 0;
+                    //find num of errors to not propogate
+                    if(matrixType === "dizzy"){
+                        offsets.forEach(offset => {
+                            const nx = x + offset.x;
+                            const ny = y + offset.y;
+                            
+                            if (nx >= 0 && nx < inputData.width && ny >= 0 && ny < inputData.height) {
+                                const ni = (ny * inputData.width + nx) * 4;
+                                const delta = error * (offset.w || offset.weight) / divisor;
+                                if(buffer.data[ni] == 0 || buffer.data[ni] == 255){
+                                    value += delta;
+                                    neighbors++;
+                                }
+                            }
+                        });
+                    }
+                    if(neighbors == 0) neighbors = 1;
 
                     // Diffuse error to neighbors
                     offsets.forEach(offset => {
@@ -161,8 +198,15 @@
                         
                         if (nx >= 0 && nx < inputData.width && ny >= 0 && ny < inputData.height) {
                             const ni = (ny * inputData.width + nx) * 4;
-                            const delta = error * (offset.w || offset.weight) / divisor;
-                            buffer.data[ni] = Math.min(255, Math.max(0, buffer.data[ni] + delta));
+                            const delta = error * (offset.w || offset.weight) / divisor + (value/ neighbors);
+                            
+                            if(matrixType === "dizzy"){
+                                if(buffer.data[ni] != 0 && buffer.data[ni] != 255){
+                                    buffer.data[ni] = Math.min(255, Math.max(0, buffer.data[ni] + delta));
+                                }
+                            }else{
+                                buffer.data[ni] = Math.min(255, Math.max(0, buffer.data[ni] + delta));
+                            }
                         }
                     });
                 } else {
@@ -175,6 +219,26 @@
                         // Set output channel
                         outputData.data[i + c] = newValue;
 
+                        let value = 0;
+                        let neighbors = 0;
+                        //find num of errors to not propogate
+                        if(matrixType === "dizzy"){
+                            offsets.forEach(offset => {
+                                const nx = x + offset.x;
+                                const ny = y + offset.y;
+                                
+                                if (nx >= 0 && nx < inputData.width && ny >= 0 && ny < inputData.height) {
+                                    const ni = (ny * inputData.width + nx) * 4 + c;
+                                    const delta = error * (offset.w || offset.weight) / divisor;
+                                    if(buffer.data[ni] == 0 || buffer.data[ni] == 255){
+                                        value += delta;
+                                        neighbors++;
+                                    }
+                                }
+                            });
+                        }
+                        if(neighbors == 0) neighbors = 1;
+
                         // Diffuse error to neighbors
                         offsets.forEach(offset => {
                             const nx = x + offset.x;
@@ -183,7 +247,14 @@
                             if (nx >= 0 && nx < inputData.width && ny >= 0 && ny < inputData.height) {
                                 const ni = (ny * inputData.width + nx) * 4 + c;
                                 const delta = error * (offset.w || offset.weight) / divisor;
-                                buffer.data[ni] = Math.min(255, Math.max(0, buffer.data[ni] + delta));
+                                
+                                if(matrixType === "dizzy"){
+                                    if(buffer.data[ni] != 0 && buffer.data[ni] != 255){
+                                        buffer.data[ni] = Math.min(255, Math.max(0, buffer.data[ni] + delta));
+                                    }
+                                }else{
+                                    buffer.data[ni] = Math.min(255, Math.max(0, buffer.data[ni] + delta));
+                                }
                             }
                         });
                     }

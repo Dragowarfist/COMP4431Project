@@ -203,37 +203,6 @@
             ],
             divisor: 8
         },
-        "dizzy": {
-            offsets: [
-                // First ring
-                {x: 1, y: 0, weight: 8},
-                {x: 1, y: 1, weight: 4},
-                {x: 0, y: 1, weight: 6},
-                {x: -1, y: 1, weight: 4},
-                {x: -1, y: 0, weight: 8},
-                {x: -1, y: -1, weight: 4},
-                {x: 0, y: -1, weight: 6},
-                {x: 1, y: -1, weight: 4},
-                // Second ring
-                {x: 2, y: 0, weight: 4},
-                {x: 2, y: 1, weight: 2},
-                {x: 2, y: 2, weight: 1},
-                {x: 1, y: 2, weight: 2},
-                {x: 0, y: 2, weight: 3},
-                {x: -1, y: 2, weight: 2},
-                {x: -2, y: 2, weight: 1},
-                {x: -2, y: 1, weight: 2},
-                {x: -2, y: 0, weight: 4},
-                {x: -2, y: -1, weight: 2},
-                {x: -2, y: -2, weight: 1},
-                {x: -1, y: -2, weight: 2},
-                {x: 0, y: -2, weight: 3},
-                {x: 1, y: -2, weight: 2},
-                {x: 2, y: -2, weight: 1},
-                {x: 2, y: -1, weight: 2}
-            ],
-            divisor: 64
-        },
         "variable-coefficient": {
             getPattern: function(x, y) {
                 // Implementation based on Ostromoukhov's paper
